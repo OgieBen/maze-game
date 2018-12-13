@@ -1,0 +1,50 @@
+.cell-size {
+    width: 90px;
+    height: 30px;
+    color: red;
+}
+
+ul {
+    display: flex;
+    width: auto;
+    list-style: none;
+    
+}
+
+
+table, ul {
+    width:auto;
+    height: auto;
+}
+
+table, td {
+    border: 1px solid gray;
+  }
+
+
+table:focus, td:focus { 
+    border: 1px solid blue;
+}
+
+/* a:focus { 
+    border: 1px solid blue;
+} */
+
+ li {
+    border: 1px solid gray;
+  }
+
+td:hover, li:hover {
+    border: 1px solid blue;
+}
+td:focus, a:focus {
+    border: 1px solid firebrick;
+}
+
+.selected {
+    border: 1px solid orange;
+}
+
+.border-slim {
+    border: 1px solid gray;
+}
