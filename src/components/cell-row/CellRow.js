@@ -82,7 +82,27 @@ export class CellRow extends Component {
             }
         }
 
-        
+        // right arrow key
+        if (event.keyCode === 39) {
+            console.log("right arrow key was pressed !!");
+            // if there is a box above move up else 
+            // do nothing.
+            let row = Math.floor(parseInt(pos) / 10) * 10;
+            console.log(row);
+            let currPos = pos - row;
+            console.log(currPos);
+            let newPos = currPos + minLeft;
+            console.log(newPos);
+            if (newPos <= maxRight) {
+                // update current position
+                newPos  += row; 
+                console.log(newPos);
+                this.setState({
+                    cell: newPos,
+                });
+            }
+
+        }
 
         // up arrow key
         if (event.keyCode === 38) {
