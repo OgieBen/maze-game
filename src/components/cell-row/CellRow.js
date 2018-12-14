@@ -4,15 +4,13 @@ export class CellRow extends Component {
 
     // set center point here
     state = {
-        cell: 32,
+        cell: 0,
         sprite: new Map(),  
+        counter: 0,
+        navCounter: 0,
     }
 
-    setSprites = () => {
-
-        let row = 5;
-        let col = 4;
-
+    setSprites = (row, col) => {
         let spriteMap = new Map();
         
         for(let j=0; j<row; j++){
@@ -30,7 +28,64 @@ export class CellRow extends Component {
         return spriteMap;
     }
 
-    cellListener = (event, id, colNum, rowNum) => {
+    setEmptyMatrix = (row, col) => {
+       
+
+        let spriteMap = new Map();
+        
+        for(let j=0; j<row; j++){
+           let tmp = [];
+           for(let i=0; i < col; i++){
+               tmp[i] = 0;
+           }
+           spriteMap.set(j, tmp);
+        }
+
+        return spriteMap;
+    }
+
+    updateSprite = (row, col, newValue, newPos) => {
+
+        let updatedSprite = this.setEmptyMatrix(this.props.rows, this.props.cols);
+        let id = row + col; 
+        let counter = this.state.counter;
+        
+
+        // divide row by 10 to get row number
+        // then subtract 1 to get 0-based index
+
+        let rIndex = (row / 10) - 1
+        
+        console.log("state =>   " + this.state.cell); console.log("id => " + id);
+
+        if (parseInt(this.state.cell) === parseInt(id)){
+            if(this.state.sprite.get(rIndex)){
+                console.log('Hey => ' + this.state.sprite.get(parseInt(rIndex))[col - 1]);
+                if(this.state.sprite.get(parseInt(rIndex))[col - 1] === 1){
+                    this.state.sprite.forEach((element, key) => {
+                        console.log('key' + key + ' : ele => ' + element);
+                        if (parseInt(key) === parseInt(rIndex)){
+                            updatedSprite.get(rIndex)[col] = newValue;
+                            counter += 1;
+                            if(counter >= this.props.rows){
+                                alert("Game over! Total moves: " + this.state.navCounter);
+                            }
+                        }else{
+                            updatedSprite.set(key, element);
+                        }
+                    });
+            
+                    this.setState({
+                        sprite: updatedSprite,
+                        counter: counter
+                    });
+                }
+            }
+        }
+        
+    }
+
+    cellListener = (event, id, rowId, colId, rowNum, colNum) => {
         event.preventDefault();
         
         let maxTop = 10;
@@ -39,20 +94,27 @@ export class CellRow extends Component {
         let maxBottom = (rowNum * 10) + 10;
         let pos = this.state.cell;
 
-
          //down arrow key
          if (event.keyCode === 40) {
-            console.log("bottom arrow key was pressed !!");
+            // console.log("bottom arrow key was pressed !!");
 
             // if there is a box below move down else 
             // do nothing.
             let newPos = pos + 10;
-            console.log(newPos);
+            // console.log("new Pos: " + newPos);
             if (newPos < maxBottom) {
                 // update current position
+                let __row = Math.floor(parseInt(pos) / 10) * 10;
+                let __col = pos - __row;
+                // console.log("prev position === " + parseInt(__row + __col)); 
+                
+                // move to next position
                 this.setState({
                     cell: newPos,
+                    navCounter: this.state.navCounter + 1,
                 });
+
+                this.updateSprite(__row, __col, 0, newPos);
             }
         }
 
@@ -62,18 +124,20 @@ export class CellRow extends Component {
             // if there is a box above move up else 
             // do nothing.
             let row = Math.floor(parseInt(pos) / 10) * 10;
-            console.log(row);
+            // currPos is the current column index
             let currPos = pos - row;
-            console.log(currPos);
             let newPos = currPos + minLeft;
-            console.log(newPos);
+            // console.log(newPos);
             if (newPos <= maxRight) {
                 // update current position
                 newPos  += row; 
-                console.log(newPos);
+        
                 this.setState({
                     cell: newPos,
+                    navCounter: this.state.navCounter + 1,
                 });
+
+                this.updateSprite(row, currPos, 0, newPos);
             }
 
         }
@@ -86,9 +150,15 @@ export class CellRow extends Component {
             let newPos = pos - maxTop;
             if (newPos > 10) {
                 // update current position
+                let __row = Math.floor(parseInt(pos) / 10) * 10;
+                let __col = pos - __row;
+               
                 this.setState({
                     cell: newPos,
+                    navCounter: this.state.navCounter + 1,
                 });
+
+                this.updateSprite(__row, __col, 0, newPos);
             }
 
         }
@@ -98,59 +168,71 @@ export class CellRow extends Component {
             // if there is a box above move up else 
             // do nothing.
             let row = Math.floor(parseInt(pos) / 10) * 10;
-            console.log(row);
+            // console.log(row);
             let currPos = pos - row;
-            console.log(currPos);
+            // console.log(currPos);
             let newPos = currPos - minLeft;
-            console.log(newPos);
+            // console.log(newPos);
             if (newPos >= 1) {
                 // update current position
                 newPos  += row; 
-                console.log(newPos);
+                // console.log(newPos);
                 this.setState({
                     cell: newPos,
+                    navCounter: this.state.navCounter + 1,
                 });
+
+                this.updateSprite(row, currPos, 0, newPos);
             }
 
         }
     }
 
     componentDidMount() {
-        let spriteMap = this.setSprites();
+        let spriteMap = this.setSprites(this.props.rows, this.props.cols);
+        let rowStart = (Math.ceil(this.props.rows / 2 )) * 10 ;
+        let colStart = (Math.ceil(this.props.cols / 2 ));
 
-        console.log(spriteMap.get(2)[2])
+        let pinPoint = rowStart + colStart
+        console.log(pinPoint);
 
         this.setState({
+            cell: pinPoint,
             sprite: spriteMap,
         });
     }
 
-    /* To begin to play user must click on the cell 
-    * with red color. if the cell has not been clicked the nothing should work.
+    /* To begin to play, a user must click on the cell 
+    * with red color. if the cell has not been clicked then nothing should work.
     * if the cell has been clicked, then the arrow keys check if the next item is the 
-    * last if it is the last then user 
-    * cannot move that way. if it is no the last cell then users can make a move. when ever these 
-    * conditions are met the app
-    * refreshes to redisplay current game */
+    * last cell. if it is the last cell, then user 
+    * cannot move that way. if it is not the last cell then users can make a move in that direction.
+    *  */
 
     render() {
 
-        let row = 5;
-        let col = 4;
+        let row = this.props.rows;
+        let col = this.props.cols;
 
       
          
         let createCol = (rowId, colId) => {
 
             let id = `${rowId}${colId}`;
-            return <a className={[this.state.cell === parseInt(id) ? 'selected' : '']} href='#' onKeyDown={(e) => this.cellListener(e, id, col, row)}>
-                <li key={id} tabindex='1' className={['cell-size']}> { this.state.sprite.get(parseInt(rowId-1)) ? this.state.sprite.get(parseInt(rowId-1))[colId - 1] : '' } </li>
+            // console.log(id);
+
+            return <a className={[this.state.cell === parseInt(id) ? 'selected' : '']} href='#' onKeyDown={(e) => this.cellListener(e, id, rowId, colId, row, col)}>
+                <li key={id} tabindex='1' className={['cell-size']}>
+                    { this.state.sprite.get(parseInt(rowId-1)) ? this.state.sprite.get(parseInt(rowId-1))[colId - 1] : '' } 
+                    {}
+                </li>
             </a>;
         };
 
         let createRow = (ele) => {
             return <ul>{ele}</ul>;
         }
+
         let tr = [];
 
         for (let i = 0; i < row; i++) {
