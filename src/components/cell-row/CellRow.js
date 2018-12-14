@@ -2,67 +2,41 @@ import React, { Component } from 'react';
 import './cellrow.css';
 export class CellRow extends Component {
 
-
-
-
     // set center point here
     state = {
-        tableFocus: false,
         cell: 32,
+        sprite: new Map(),  
     }
 
-    setCurrentCell = (pos) => {
-        this.setState({
-            cell: pos,
-        });
+    setSprites = () => {
+
+        let row = 5;
+        let col = 4;
+
+        let spriteMap = new Map();
+        
+        for(let j=0; j<row; j++){
+           let tmp = [];
+           for(let i=0; i < col; i++){
+               tmp[i] = 0;
+           }
+           let randIndex = Math.floor(Math.random(col) * (col - 0) + 0);
+           tmp[randIndex] = 1;
+           spriteMap.set(j, tmp);
+        }
+
+        console.log(spriteMap.size);
+
+        return spriteMap;
     }
 
-    tableListener = (event) => {
-
-        // navigate box based on current position
-        let maxTop = 10;
-        let maxBottom = 50;
-        let pos = this.state.cell;
-
-        if (event.keyCode === 38) {
-            alert("up arrow key was pressed !!");
-
-            // if there is a box above move up else 
-            // do nothing.
-            let newPos = pos - maxTop;
-            if (newPos > 10) {
-                // update current position
-                this.setCurrentCell(pos);
-            }
-
-        }
-
-        // left arrow key
-        if (event.keyCode === 37) {
-            alert("left arrow key was pressed !!");
-        }
-
-        //right arrow key
-        if (event.keyCode === 39) {
-            alert("right arrow key was pressed !!");
-        }
-
-        // down arrow key
-        if (event.keyCode === 40) {
-            alert("down arrow key was pressed !!");
-        }
-    }
-
-    cellListener = (event, id) => {
+    cellListener = (event, id, colNum, rowNum) => {
         event.preventDefault();
-        if (this.state.cell === parseInt(id)) {
-            console.log('currently: ' + id);
-        }
-
+        
         let maxTop = 10;
         let minLeft = 1;
-        let maxRight = 4;
-        let maxBottom = 60;
+        let maxRight = colNum;
+        let maxBottom = (rowNum * 10) + 10;
         let pos = this.state.cell;
 
 
@@ -142,13 +116,18 @@ export class CellRow extends Component {
     }
 
     componentDidMount() {
-        
+        let spriteMap = this.setSprites();
+
+        console.log(spriteMap.get(2)[2])
+
+        this.setState({
+            sprite: spriteMap,
+        });
     }
 
-
-    /* To bgin to play user must click on the cell 
+    /* To begin to play user must click on the cell 
     * with red color. if the cell has not been clicked the nothing should work.
-    * if the cell has been clicked then, the arrow keys check if the next item is the 
+    * if the cell has been clicked, then the arrow keys check if the next item is the 
     * last if it is the last then user 
     * cannot move that way. if it is no the last cell then users can make a move. when ever these 
     * conditions are met the app
@@ -156,11 +135,16 @@ export class CellRow extends Component {
 
     render() {
 
+        let row = 5;
+        let col = 4;
+
+      
+         
         let createCol = (rowId, colId) => {
 
             let id = `${rowId}${colId}`;
-            return <a className={[this.state.cell === parseInt(id) ? 'selected' : '']} href='#' onKeyDown={(e) => this.cellListener(e, id)}>
-                <li key={id} tabindex='1' className={['cell-size']}> x </li>
+            return <a className={[this.state.cell === parseInt(id) ? 'selected' : '']} href='#' onKeyDown={(e) => this.cellListener(e, id, col, row)}>
+                <li key={id} tabindex='1' className={['cell-size']}> { this.state.sprite.get(parseInt(rowId-1)) ? this.state.sprite.get(parseInt(rowId-1))[colId - 1] : '' } </li>
             </a>;
         };
 
@@ -169,9 +153,9 @@ export class CellRow extends Component {
         }
         let tr = [];
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < row; i++) {
             let tc = [];
-            for (let j = 0; j < 4; j++) {
+            for (let j = 0; j < col; j++) {
                 tc.push(createCol(i + 1, j + 1));
             }
             tr.push(createRow(tc));
