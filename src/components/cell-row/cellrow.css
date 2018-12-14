@@ -43,6 +43,10 @@ td:focus, a:focus {
 
 .selected {
     border: 1px solid orange;
+    background: url('../../images/character2.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain, cover;
 }
 
 .border-slim {
