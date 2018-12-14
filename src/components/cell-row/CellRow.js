@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './cellrow.css';
+import character1 from '../../images/character1.png';
 export class CellRow extends Component {
 
     // set center point here
@@ -56,14 +57,14 @@ export class CellRow extends Component {
 
         let rIndex = (row / 10) - 1
         
-        console.log("state =>   " + this.state.cell); console.log("id => " + id);
+        // console.log("state =>   " + this.state.cell); console.log("id => " + id);
 
         if (parseInt(this.state.cell) === parseInt(id)){
             if(this.state.sprite.get(rIndex)){
-                console.log('Hey => ' + this.state.sprite.get(parseInt(rIndex))[col - 1]);
+                // console.log('Hey => ' + this.state.sprite.get(parseInt(rIndex))[col - 1]);
                 if(this.state.sprite.get(parseInt(rIndex))[col - 1] === 1){
                     this.state.sprite.forEach((element, key) => {
-                        console.log('key' + key + ' : ele => ' + element);
+                        // console.log('key' + key + ' : ele => ' + element);
                         if (parseInt(key) === parseInt(rIndex)){
                             updatedSprite.get(rIndex)[col] = newValue;
                             counter += 1;
@@ -193,13 +194,19 @@ export class CellRow extends Component {
         let rowStart = (Math.ceil(this.props.rows / 2 )) * 10 ;
         let colStart = (Math.ceil(this.props.cols / 2 ));
 
-        let pinPoint = rowStart + colStart
-        console.log(pinPoint);
+        let centerPoint = rowStart + colStart
+        console.log(centerPoint);
 
         this.setState({
-            cell: pinPoint,
+            cell: centerPoint,
             sprite: spriteMap,
         });
+    }
+
+    displaySprite(id, rowId, colId) {
+        if (this.state.sprite.get(parseInt(rowId-1))[colId - 1] === 1 ) {
+                return <img src={character1} />;       
+        }
     }
 
     /* To begin to play, a user must click on the cell 
@@ -223,7 +230,7 @@ export class CellRow extends Component {
 
             return <a className={[this.state.cell === parseInt(id) ? 'selected' : '']} href='#' onKeyDown={(e) => this.cellListener(e, id, rowId, colId, row, col)}>
                 <li key={id} tabindex='1' className={['cell-size']}>
-                    { this.state.sprite.get(parseInt(rowId-1)) ? this.state.sprite.get(parseInt(rowId-1))[colId - 1] : '' } 
+                    { this.state.sprite.get(parseInt(rowId-1)) ? this.displaySprite(id, rowId, colId) : '' } 
                     {}
                 </li>
             </a>;
