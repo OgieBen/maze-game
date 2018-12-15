@@ -91,7 +91,7 @@ export class CellRow extends Component {
         
         let maxTop = 10;
         let minLeft = 1;
-        let maxRight = colNum;
+        let maxRight = colNum + 1;
         let maxBottom = (rowNum * 10) + 10;
         let pos = this.state.cell;
 
@@ -127,11 +127,12 @@ export class CellRow extends Component {
             let row = Math.floor(parseInt(pos) / 10) * 10;
             // currPos is the current column index
             let currPos = pos - row;
-            let newPos = currPos + minLeft;
+            let newPos = currPos + 1;
             // console.log(newPos);
-            if (newPos <= maxRight) {
+            if (newPos < maxRight) {
                 // update current position
                 newPos  += row; 
+                console.log(newPos);
         
                 this.setState({
                     cell: newPos,
